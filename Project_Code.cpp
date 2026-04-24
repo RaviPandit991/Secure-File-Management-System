@@ -209,10 +209,10 @@ void read_file(User user) {
     }
 }
 
-void delete_file(User user) {
+bool delete_file(User user) {
     if (!checkAccess(user.role, "delete")) {
         cout << "Access Denied!\n";
-        return;
+        return false;  // 🔴 signal failure
     }
 
     string name;
@@ -222,7 +222,10 @@ void delete_file(User user) {
     if (remove(name.c_str()) == 0) {
         cout << "Deleted!\n";
         log_action("DELETE", name);
+        return true;
     }
+
+    return false;
 }
 
 
@@ -316,7 +319,10 @@ int main() {
                     case 1: create_file(currentUser); break;
                     case 2: write_file(currentUser); break;
                     case 3: read_file(currentUser); break;
-                    case 4: delete_file(currentUser); break;
+                    case 4:
+                        if (!delete_file(currentUser))
+                            goto logout;   // 🔥 exit menu
+                        break;
                     case 5: rename_file(currentUser); break;
                     case 6: file_size(); break;
                     case 7: last_modified(); break;
